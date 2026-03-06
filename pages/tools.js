@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import Layout from '../components/Layout'
 import { useI18n } from '../lib/i18n'
@@ -197,7 +198,7 @@ const adus = [
 
 export default function ToolsPage() {
   const { t, lang } = useI18n()
-
+  const { basePath } = useRouter()
   // ADU Configurator state
   const [aduConfig, setAduConfig] = useState({})
   const [aduStep, setAduStep] = useState(0)
@@ -263,7 +264,7 @@ export default function ToolsPage() {
     '/materials/conpavers.jpg', '/materials/stopavers.jpg',
     '/materials/emrevenscreens.jpg', '/materials/gravels.jpg',
     '/materials/firesplants.jpg',
-  ]
+  ].map(p => basePath + p)
 
   useEffect(() => {
     if (isHoveringMaterials) { clearInterval(autoSlideRef.current); return }
@@ -778,10 +779,10 @@ export default function ToolsPage() {
             <h4 dangerouslySetInnerHTML={{ __html: t('mat-walls-h4') }} />
             <ul>
               {[
-                { img: '/materials/ficesipanels.jpg', key: 'mat-walls-li1' },
-                { img: '/materials/cefiboards.jpg', key: 'mat-walls-li2' },
-                { img: '/materials/conblocks.jpg', key: 'mat-walls-li3' },
-                { img: '/materials/soconmanunits.jpg', key: 'mat-walls-li4' },
+                { img: `${basePath}/materials/ficesipanels.jpg`, key: 'mat-walls-li1' },
+                { img: `${basePath}/materials/cefiboards.jpg`, key: 'mat-walls-li2' },
+                { img: `${basePath}/materials/conblocks.jpg`, key: 'mat-walls-li3' },
+                { img: `${basePath}/materials/soconmanunits.jpg`, key: 'mat-walls-li4' },
               ].map((item) => (
                 <li key={item.img}
                   onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc(item.img); setPreviewAlt(`${t('fire-resistant-material')}: ${t(item.key)}`) }}
@@ -793,8 +794,8 @@ export default function ToolsPage() {
             <h4 dangerouslySetInnerHTML={{ __html: t('mat-roofing-h4') }} />
             <ul>
               {[
-                { img: '/materials/roofpanels.jpg', key: 'mat-roofing-li1' },
-                { img: '/materials/calrooftiles.jpg', key: 'mat-roofing-li2' },
+                { img: `${basePath}/materials/roofpanels.jpg`, key: 'mat-roofing-li1' },
+                { img: `${basePath}/materials/calrooftiles.jpg`, key: 'mat-roofing-li2' },
               ].map((item) => (
                 <li key={item.img}
                   onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc(item.img); setPreviewAlt(`${t('fire-resistant-material')}: ${t(item.key)}`) }}
@@ -806,8 +807,8 @@ export default function ToolsPage() {
             <h4 dangerouslySetInnerHTML={{ __html: t('mat-windows-h4') }} />
             <ul>
               {[
-                { img: '/materials/tempglasswindows.jpg', key: 'mat-windows-li1' },
-                { img: '/materials/mewinframes.jpg', key: 'mat-windows-li2' },
+                { img: `${basePath}/materials/tempglasswindows.jpg`, key: 'mat-windows-li1' },
+                { img: `${basePath}/materials/mewinframes.jpg`, key: 'mat-windows-li2' },
               ].map((item) => (
                 <li key={item.img}
                   onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc(item.img); setPreviewAlt(`${t('fire-resistant-material')}: ${t(item.key)}`) }}
@@ -819,7 +820,7 @@ export default function ToolsPage() {
             <h4 dangerouslySetInnerHTML={{ __html: t('mat-doors-h4') }} />
             <ul>
               <li
-                onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc('/materials/steexdoords.jpg'); setPreviewAlt(`${t('fire-resistant-material')}: ${t('mat-doors-li1')}`) }}
+                onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc(`${basePath}/materials/steexdoords.jpg`); setPreviewAlt(`${t('fire-resistant-material')}: ${t('mat-doors-li1')}`) }}
                 onMouseLeave={() => setIsHoveringMaterials(false)}>
                 {t('mat-doors-li1')}
               </li>
@@ -827,7 +828,7 @@ export default function ToolsPage() {
             <h4 dangerouslySetInnerHTML={{ __html: t('mat-exterior-h4') }} />
             <ul>
               <li
-                onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc('/materials/firecomdeckboards.jpg'); setPreviewAlt(`${t('fire-resistant-material')}: ${t('mat-exterior-li1')}`) }}
+                onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc(`${basePath}/materials/firecomdeckboards.jpg`); setPreviewAlt(`${t('fire-resistant-material')}: ${t('mat-exterior-li1')}`) }}
                 onMouseLeave={() => setIsHoveringMaterials(false)}>
                 {t('mat-exterior-li1')}
               </li>
@@ -835,8 +836,8 @@ export default function ToolsPage() {
             <h4 dangerouslySetInnerHTML={{ __html: t('mat-paving-h4') }} />
             <ul>
               {[
-                { img: '/materials/conpavers.jpg', key: 'mat-paving-li1' },
-                { img: '/materials/stopavers.jpg', key: 'mat-paving-li2' },
+                { img: `${basePath}/materials/conpavers.jpg`, key: 'mat-paving-li1' },
+                { img: `${basePath}/materials/stopavers.jpg`, key: 'mat-paving-li2' },
               ].map((item) => (
                 <li key={item.img}
                   onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc(item.img); setPreviewAlt(`${t('fire-resistant-material')}: ${t(item.key)}`) }}
@@ -848,7 +849,7 @@ export default function ToolsPage() {
             <h4 dangerouslySetInnerHTML={{ __html: t('mat-vent-h4') }} />
             <ul>
               <li
-                onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc('/materials/emrevenscreens.jpg'); setPreviewAlt(`${t('fire-resistant-material')}: ${t('mat-vent-li1')}`) }}
+                onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc(`${basePath}/materials/emrevenscreens.jpg`); setPreviewAlt(`${t('fire-resistant-material')}: ${t('mat-vent-li1')}`) }}
                 onMouseLeave={() => setIsHoveringMaterials(false)}>
                 {t('mat-vent-li1')}
               </li>
@@ -856,8 +857,8 @@ export default function ToolsPage() {
             <h4 dangerouslySetInnerHTML={{ __html: t('mat-landscape-h4') }} />
             <ul>
               {[
-                { img: '/materials/gravels.jpg', key: 'mat-landscape-li1' },
-                { img: '/materials/firesplants.jpg', key: 'mat-landscape-li2' },
+                { img: `${basePath}/materials/gravels.jpg`, key: 'mat-landscape-li1' },
+                { img: `${basePath}/materials/firesplants.jpg`, key: 'mat-landscape-li2' },
               ].map((item) => (
                 <li key={item.img}
                   onMouseEnter={() => { setIsHoveringMaterials(true); setPreviewSrc(item.img); setPreviewAlt(`${t('fire-resistant-material')}: ${t(item.key)}`) }}
@@ -1578,3 +1579,5 @@ export default function ToolsPage() {
     </Layout>
   )
 }
+
+

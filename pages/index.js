@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react'
+import { useRouter } from 'next/router'
 import Layout from '../components/Layout'
 import { useI18n } from '../lib/i18n'
 
@@ -15,6 +16,7 @@ const tocLinks = [
 
 export default function GuidesPage() {
   const { t, lang } = useI18n()
+  const { basePath } = useRouter()
 
   const readSection = useCallback((elementId) => {
     if (typeof window === 'undefined') return
@@ -50,7 +52,7 @@ export default function GuidesPage() {
         </div>
         <div className="hero-video">
           <video autoPlay muted loop playsInline>
-            <source src="/logos/USGBC_Logo_Reveal_2.mp4" type="video/mp4" />
+            <source src={`${basePath}/logos/USGBC_Logo_Reveal_2.mp4`} type="video/mp4" />
           </video>
         </div>
       </section>

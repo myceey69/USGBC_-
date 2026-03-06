@@ -99,7 +99,7 @@ export default function Layout({ children, tocLinks, activePage }) {
           <div className="brand">
             <div className="brand-top">
               <div className="logo">
-                <img src="/logos/smallLogoUSGBC.png" alt="USGBC Logo" />
+                <img src={`${router.basePath}/logos/smallLogoUSGBC.png`} alt="USGBC Logo" />
               </div>
               <h1 dangerouslySetInnerHTML={{ __html: t('brand-title') }} />
             </div>
