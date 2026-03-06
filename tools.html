@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel ="stylesheet" type="text/css" href="style.css"> 
+	
+
+  <title>Resilient Rebuilding Guide (USGBC-aligned)</title>
+  <meta name="description" content="Interactive post-fire rebuilding guide aligned with USGBC/green-resilience principles: water resilience, home hardening, hubs, equity, and monitoring." />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://{s}.tile.openstreetmap.org" crossorigin>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/modern-css-reset/dist/reset.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <!-- Cesium ion Story Viewer dependencies -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/webcomponentsjs/2.4.4/webcomponents-loader.js"></script>
+  <script src="https://unpkg.com/pepjs@0.5.2/dist/pep.min.js"></script>
+</head>
+<body>
+<div id="scrollBar"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<button id="ttsStop">⏹ Stop Reading</button>
+<div class="share-toast" id="shareToast">🔗 Link copied!</div>
+<div class="app">
+  <button class="show-sidebar" id="showSidebar">☰ Menu</button>
+  <nav id="sidebar">
+    <div class="brand">
+      <div class="logo">
+  <img src="logos/smallLogoUSGBC.png" alt="USGBC Logo">
+	</div>
+      <h1 data-i18n="brand-title">Rebuilding Guide</h1>
+      <button id="themeToggle" title="Toggle light/dark mode">🌙</button>
+      <button id="langToggle" title="Switch language / Cambiar idioma">ES</button>
+      <button id="hideSidebar" class="hide-btn" title="Hide sidebar">×</button>
+    </div>
+    <div class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.2-4.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="search" placeholder="Search sections…" />
+    </div>
+	
+	 <div class="sidebar-nav-btns">
+      <a href="index.html" class="nav-page-btn" data-i18n="nav-guides">📖 Go to Guides</a>
+      <a href="tools.html" class="nav-page-btn active" data-i18n="nav-tools">🛠️ Go to Tools</a>
+      <div class="pdf-link-wrapper">
+        <a href="USGBC AURA Report.pdf" target="_blank" data-i18n="nav-pdf">📄 View USGBC AURA Report (PDF)</a>
+      </div>
+      <div class="last-updated" data-i18n="last-updated">Last updated: March 2025</div>
+    </div>
+    <div class="toc" id="toc">
+      <div class="group" data-i18n="toc-group-tools">Tools</div>
+      <a href="#cesium-story" data-i18n="toc-3d-viewer">3D Story Viewer</a>
+      <a href="#tools" data-i18n="toc-tools-checklist">Tools & Checklists</a>
+	  <a href="#fire-materials" data-i18n="toc-fire-materials">Fire-Resistant Building Materials</a>
+      <a href="#adu" data-i18n="toc-adu">ADU Explorer</a>
+      <a href="#adu-tester" data-i18n="toc-adu-tester">House/ADU Wildfire Tester</a>
+      <a href="#wildfire-tools" data-i18n="toc-wildfire-events">Wildfire Events</a>
+      <a href="#mapSection" data-i18n="toc-map">Map</a>
+      
+    </div>
+   
+  </nav>
+  <main>
+    
+
+     <!-- Cesium ion Story Viewer -->
+    <section class="panel" id="cesium-story">
+      <h3 data-i18n="cesium-h3">3D Story Viewer</h3>
+      <p class="small">Interactive 3D visualization from Cesium ion. Use mouse/touch to navigate the scene.</p>
+      
+      <div class="cesium-container" style="height: 600px; position: relative; border-radius: 8px; overflow: hidden;">
+        <iframe 
+          src="https://ion.cesium.com/stories/viewer/?id=3b56607d-2e71-41b9-aa84-682b0be291d6" 
+          style="width: 100%; height: 100%; border: none; border-radius: 8px;"
+          title="Cesium ion 3D Story Viewer"
+          allowfullscreen>
+        </iframe>
+      </div>
+      
+      <div class="small" style="margin-top: 12px;">
+        <p><strong>Navigation tips:</strong></p>
+        <ul>
+          <li>Left click + drag to rotate the view</li>
+          <li>Right click + drag to zoom in/out</li>
+          <li>Middle click + drag to pan</li>
+          <li>Use touch gestures on mobile devices</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel" id="tools">
+  <h3 data-i18n="tools-h3">Home-Hardening & Safety Tools</h3>
+
+  <div class="grid cols-2">
+
+    <!-- LEFT SIDE: CHECKLIST -->
+    <div>
+      <h4 data-i18n="checklist-h4">Home-Hardening Checklist</h4>
+	  <br>
+      <div id="checklist" class="checklist"></div>
+      <div class="small" id="progress">0 of 10 completed</div>
+    </div>
+
+    <!-- RIGHT SIDE: RISK CARD + SAFETY METER -->
+<div class="right-tools">
+
+  <!-- Wildfire Risk Snapshot -->
+  <div class="risk-card">
+    <h4 data-i18n="risk-snapshot-h4">Wildfire Risk Snapshot</h4>
+    <ul>
+      <li><strong>Summer highs:</strong> 95–110°F</li>
+      <li><strong>Ember exposure:</strong> Moderate–High</li>
+      <li><strong>Slope risk:</strong> High (foothill interface)</li>
+      <li><strong>Wind drivers:</strong> Santa Ana winds</li>
+      <li><strong>Historic fire days/year:</strong> 12–30</li>
+    </ul>
+  </div>
+
+  <!-- Safety Score Meter -->
+  <div class="safety-meter">
+    <h4 data-i18n="safety-meter-h4">Safety Score Meter</h4>
+    <div class="meter-bar">
+      <div class="meter-fill" id="meterFill"></div>
+    </div>
+    <p id="meterText" class="small">0% complete</p>
+  </div>
+
+  <!-- Permit & Policy Shortcuts -->
+  <div class="policy-card">
+    <h4 data-i18n="policy-card-h4">Permit & Policy Shortcuts</h4>
+    <ul>
+      <li>Use expedited permitting pathways for projects meeting resilience standards (pp. 18–19, 26–27).</li>
+      <li>Bundle rainwater/greywater and PV+storage in one submission; request fee waivers for survivors.</li>
+      <li>Coordinate early with mutual water companies for tank tie-ins and hydrant accessibility.</li>
+    </ul>
+  </div>
+
+</div>
+
+</section>
+
+
+
+
+
+    <section class="panel" id="tank-sizing">
+      <h3 data-i18n="tank-h3">Tank Sizing Estimator</h3>
+      <p class="small" data-i18n="tank-desc">Calculate recommended water tank capacity for rainwater harvesting, firefighting, and domestic use.</p>
+      
+      <div class="calc">
+        <div class="row">
+          <label><span data-i18n="tank-label-roof">Roof catchment area (sq ft)</span>
+            <input id="roofArea" type="number" value="1500" min="0" />
+          </label>
+          <label><span data-i18n="tank-label-rain">Annual rainfall (inches)</span>
+            <input id="rainIn" type="number" value="18" min="0" />
+          </label>
+          <label><span data-i18n="tank-label-eff">Capture efficiency</span>
+            <select id="eff">
+              <option value="0.75" selected>75% (typical)</option>
+              <option value="0.85">85% (good)</option>
+              <option value="0.9">90% (excellent)</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label><span data-i18n="tank-label-gpm">Emergency draw (gpm for firefighting)</span>
+            <input id="gpm" type="number" value="10" min="0" />
+          </label>
+          <label><span data-i18n="tank-label-min">Fire duration (minutes)</span>
+            <input id="minutes" type="number" value="30" min="0" />
+          </label>
+          <label><span data-i18n="tank-label-days">Domestic reserve (days @ 50 gpd/person, 3 ppl)</span>
+            <input id="days" type="number" value="3" min="0" />
+          </label>
+        </div>
+        <button class="btn brand" id="calcBtn" data-i18n="tank-calc-btn">Calculate</button>
+        <p class="result" id="tankResult" aria-live="polite"></p>
+        <div id="tankChartWrap">
+          <h4 style="margin-bottom:12px;font-size:1rem;color:#e6f0ff;">Storage Breakdown</h4>
+          <canvas id="tankDonut"></canvas>
+        </div>
+        <button class="btn" id="printChecklist" style="margin-top:10px;" onclick="window.print()" data-i18n="tank-print-btn">🖨️ Print / Save as PDF</button>
+        <p class="note" data-i18n="tank-note">Rule of thumb: gallons harvested ≈ roofArea × rainIn × 0.623 × efficiency. Add fire + domestic reserves.</p>
+      </div>
+    </section>
+	
+	<!-- ======================= FIRE-RESISTANT MATERIALS ======================= -->
+<section class="panel" id="fire-materials">
+  <h3 data-i18n="fire-materials-h3">Fire-Resistant Building Materials</h3>
+
+  <div class="fire-materials-grid">
+
+    <!-- LEFT: TEXT -->
+    <div class="fire-materials-text">
+      <h4 data-i18n="mat-walls-h4">Walls / Structural Materials</h4>
+      <ul>
+        <li data-img="materials/ficesipanels.jpg">Fiber cement siding panels</li>
+        <li data-img="materials/cefiboards.jpg">Stucco / cement finish boards</li>
+        <li data-img="materials/conblocks.jpg">Concrete blocks (CMU)</li>
+		<li data-img="materials/soconmanunits.jpg">Solid concrete masonry units</li>
+      </ul>
+
+      <h4 data-i18n="mat-roofing-h4">Roofing Materials</h4>
+      <ul>
+        <li data-img="materials/roofpanels.jpg">Standing seam metal roofing panels</li>
+        <li data-img="materials/calrooftiles.jpg">Clay roof tiles (terracotta)</li>
+		
+      </ul>
+
+      <h4 data-i18n="mat-windows-h4">Windows / Openings</h4>
+      <ul>
+        <li data-img="materials/tempglasswindows.jpg">Dual-pane tempered glass windows</li>
+		<li data-img="materials/mewinframes.jpg">Aluminum / metal window frames</li>
+		
+      </ul>
+      <h4 data-i18n="mat-doors-h4">Doors</h4>
+      <ul>
+        <li data-img="materials/steexdoords.jpg">Steel exterior doors (fire-rated)</li>
+      </ul>
+
+      <h4 data-i18n="mat-exterior-h4">Exterior Surfaces / Decking</h4>
+      <ul>
+       
+		<li data-img="materials/firecomdeckboards.jpg">Fire-resistant composite decking boards</li>
+      </ul>
+
+      <h4 data-i18n="mat-paving-h4">Paving / Hardscape</h4>
+      <ul>
+        
+		<li data-img="materials/conpavers.jpg">Concrete pavers</li>
+    
+		<li data-img="materials/stopavers.jpg">Stone pavers</li>
+      </ul>
+
+      <h4 data-i18n="mat-vent-h4">Ventilation Protection</h4>
+      <ul>
+       
+		<li data-img="materials/emrevenscreens.jpg">Ember-resistant vent screens / metal vent covers</li>
+      </ul>
+
+      <h4 data-i18n="mat-landscape-h4">Defensive Landscaping</h4>
+      <ul>
+        
+		<li data-img="materials/gravels.jpg">Gravel / decorative stone</li>
+        
+		<li data-img="materials/firesplants.jpg">Fire-resistant plants (succulents)</li>
+      </ul>
+    </div>
+<div id="materialPreview">
+  <img src="" alt="Material preview">
+</div>
+
+
+  </div>
+</section>
+
+    <section class="panel" id="adu">
+      <h3 data-i18n="adu-h3">ADU Explorer: Sustainable Rebuilding Options</h3>
+      <p class="small" data-i18n="adu-desc">Explore fire-resilient, water-smart, and equitable accessory dwelling unit (ADU) models suitable for your recovery plan.</p>
+      <div class="adu-grid" id="aduGrid"></div>
+
+      <div id="aduViewer" class="adu-viewer" hidden>
+        <h4 id="aduTitle"></h4>
+		<div class="material-select" style="margin: 15px 0; display:flex; gap:20px; justify-content:center;">
+  <label style="cursor:pointer;">
+    <input type="radio" name="material" value="marble" checked>
+    Marble
+  </label>
+
+  <label style="cursor:pointer;">
+    <input type="radio" name="material" value="ceramic">
+    Ceramic
+  </label>
+  
+  <label style="cursor:pointer;">
+    <input type="radio" name="material" value="granite">
+    Granite
+  </label>
+</div>
+        <model-viewer id="aduModel" src="" alt="ADU model" auto-rotate camera-controls ar ar-modes="webxr scene-viewer quick-look" exposure="1.1" shadow-intensity="0.8"></model-viewer>
+        <p id="aduDesc" class="small"></p>
+        <button class="btn" id="aduClose">Close Viewer</button>
+      </div>
+
+      <!-- ADU Compare Section -->
+      <div id="aduCompareSection">
+        <h4 style="color:#e6f0ff;margin-bottom:8px;" data-i18n="compare-h4">⚖️ Side-by-Side Comparison</h4>
+        <p class="small" style="color:#8aa0b7;margin-bottom:12px;" data-i18n="compare-desc">Click two ADU cards above to compare them. Selected cards are highlighted in yellow.</p>
+        <div id="aduCompare">
+          <div class="compare-slot" id="compareSlot1">
+            <h5 id="compareTitle1">Select an ADU</h5>
+            <model-viewer id="compareModel1" src="" alt="Compare ADU 1" auto-rotate camera-controls exposure="1.1" shadow-intensity="0.8"></model-viewer>
+          </div>
+          <div class="compare-slot" id="compareSlot2">
+            <h5 id="compareTitle2">Select an ADU</h5>
+            <model-viewer id="compareModel2" src="" alt="Compare ADU 2" auto-rotate camera-controls exposure="1.1" shadow-intensity="0.8"></model-viewer>
+          </div>
+        </div>
+        <button class="btn" id="clearCompareBtn" style="margin-top:12px;" data-i18n="clear-compare-btn">✕ Clear Comparison</button>
+      </div>
+    </section>
+	
+
+
+    <!-- NEW: House / ADU Wildfire Tester -->
+    <section class="panel" id="adu-tester">
+	<section class="panel" id="photo-tester">
+  <h3 data-i18n="photo-h3">Upload a Photo of Your House / ADU</h3>
+  <p class="small" data-i18n="photo-desc">
+    Upload an exterior photo of your home or ADU.  
+    This helps visually compare your structure with wildfire-safe guidelines.
+  </p>
+
+  <div class="calc">
+    <label><span data-i18n="photo-label">Choose an image of your house</span>
+      <input id="housePhotoInput" type="file" accept="image/*">
+    </label>
+
+    <div id="photoPreviewWrapper" style="margin-top:15px;" hidden>
+      <h4>Preview</h4>
+      <img id="housePhotoPreview" 
+     src="" 
+     alt="Uploaded house photo"
+     style="
+       width: 300px;
+       height: auto;
+       border-radius: 12px;
+       border: 1px solid #1a2943;
+       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+       display: block;
+       margin: 0 auto;
+     ">
+	 
+	 <button id="deletePhotoBtn" 
+        class="btn" 
+        style="margin-top:12px; background:#7f1d1d; border-color:#b91c1c;"
+        data-i18n="delete-photo-btn">
+  Delete Image
+</button>
+    </div>
+  </div>
+  <div id="photoError" 
+     style="display:none; 
+            margin-top:12px; 
+            padding:12px 16px; 
+            border-radius:12px;
+            border:1px solid rgba(248,113,113,0.4);
+            background:rgba(248,113,113,0.15);
+            color:#fecaca; 
+            font-size:0.9rem;
+            backdrop-filter:blur(6px);">
+</div>
+</section>
+      <h3 data-i18n="wt-h3">House / ADU Wildfire Safety Tester</h3>
+      <p class="small">
+        Answer these quick questions about your house or ADU.  
+        You’ll get a <strong>1–10 wildfire safety rating</strong> (1 = less safe, 10 = safest)  
+        and an informal “approval” style status. This is a heuristic tool only; always confirm with local codes.
+      </p>
+
+      <div class="calc">
+        <div class="row">
+          <label><span data-i18n="wt-label-roof">Roof rating</span>
+            <select id="wtRoof">
+              <option value="0">Unknown / below Class A</option>
+              <option value="2">Class B</option>
+              <option value="3">Class A (metal, tile, comp)</option>
+            </select>
+          </label>
+          <label><span data-i18n="wt-label-walls">Exterior walls</span>
+            <select id="wtWalls">
+              <option value="0">Combustible siding (wood/vinyl)</option>
+              <option value="2">Mixed / partially non-combustible</option>
+              <option value="3">Non-combustible (stucco, fiber-cement, masonry)</option>
+            </select>
+          </label>
+          <label><span data-i18n="wt-label-space">Defensible space</span>
+            <select id="wtSpace">
+              <option value="0">Minimal clearing</option>
+              <option value="2">Some clearing (5–30 ft partly treated)</option>
+              <option value="3">0–5 ft ignition-free + 5–30 ft lean/clean/green</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="row">
+          <label><span data-i18n="wt-label-vents">Vents &amp; eaves</span>
+            <select id="wtVents">
+              <option value="0">Unscreened vents / open eaves</option>
+              <option value="2">Screened vents or boxed eaves</option>
+              <option value="3">1/8" metal mesh ember vents + boxed eaves</option>
+            </select>
+          </label>
+          <label><span data-i18n="wt-label-windows">Windows &amp; openings</span>
+            <select id="wtWindows">
+              <option value="0">Single-pane / unprotected</option>
+              <option value="2">Some tempered or shutters</option>
+              <option value="3">Dual-pane w/ tempered outer + shutters/screens</option>
+            </select>
+          </label>
+          <label><span data-i18n="wt-label-water">Onsite water &amp; access</span>
+            <select id="wtWater">
+              <option value="0">No dedicated water / poor access</option>
+              <option value="2">Small tank or pool; limited firefighter outlet</option>
+              <option value="3">≥2,500 gal tank/pool with fire outlet & clear access</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="row">
+          <label><span data-i18n="wt-label-exposure">Adjacent fuels / exposure</span>
+            <select id="wtExposure">
+              <option value="-2">Steep slope / heavy fuels within 30 ft</option>
+              <option value="0">Moderate fuels / typical block</option>
+              <option value="2">Low fuels / buffered from canyons</option>
+            </select>
+          </label>
+          <label><span data-i18n="wt-label-sprinklers">Sprinklers / interior systems</span>
+            <select id="wtSprinklers">
+              <option value="0">None</option>
+              <option value="1">Partial (add-ons / limited)</option>
+              <option value="2">Full NFPA 13D/13R or equivalent</option>
+            </select>
+          </label>
+        </div>
+
+        <button class="btn brand" type="button" id="wtRun" data-i18n="wt-run-btn">Rate my wildfire safety</button>
+        <button class="btn" type="button" id="wtShare" style="margin-left:8px;" data-i18n="wt-share-btn">🔗 Share Result</button>
+        <p class="result" id="wtResult" aria-live="polite"></p>
+        <p class="note small">
+          This tool gives an <strong>approximate</strong> rating only and does not replace a WUI code review,
+          local fire department inspection, or guidance from a wildfire specialist.
+        </p>
+      </div>
+    </section>
+
+    <!-- Wildfire Events widget -->
+    <section class="panel" id="wildfire-tools">
+      <h3 data-i18n="wildfire-events-h3">Wildfire Events</h3>
+      <p class="small" data-i18n="wildfire-events-desc">Enter an area and time window. Results will appear below and on the map.</p>
+
+      <form id="wf-form" class="wf-form" novalidate>
+        <fieldset class="wf-fieldset">
+          <legend><span>Area</span></legend>
+          <div class="wf-row">
+            <label>Min Longitude <input inputmode="decimal" type="text" id="wfMinLon" value="0"></label>
+            <label>Max Longitude <input inputmode="decimal" type="text" id="wfMaxLon" value="0"></label>
+            <label>Min Latitude  <input inputmode="decimal" type="text" id="wfMinLat" value="0"></label>
+            <label>Max Latitude  <input inputmode="decimal" type="text" id="wfMaxLat" value="0"></label>
+          </div>
+          <div class="wf-input-help">
+            <p class="small"><strong>California bounds:</strong> Long: -125 to -114, Lat: 32 to 42</p>
+            <p class="small"><strong>Example:</strong> For Southern CA: Min Lon -118, Min Lat 32, Max Lon -115, Max Lat 35</p>
+          </div>
+        </fieldset>
+
+        <fieldset class="wf-fieldset">
+          <legend><span>Time window</span></legend>
+          <div class="wf-row">
+            <label>Days look-back <input inputmode="numeric" type="text" id="wfDays" value="0"></label>
+            <span class="wf-or" aria-hidden="true">or</span>
+            <label>Start <input type="date" id="wfStart"></label>
+            <label>End <input type="date" id="wfEnd"></label>
+          </div>
+          <div class="wf-input-help">
+            <p class="small"><strong>Days look-back:</strong> Enter 365 for one year, 30 for one month</p>
+            <p class="small"><strong>Date range:</strong> Use date pickers for specific time periods</p>
+          </div>
+        </fieldset>
+
+        <div class="wf-actions">
+          <button type="submit" id="wfRun" class="btn brand">Fetch Wildfires</button>
+          <button type="button" id="wfClear" class="btn">Clear</button>
+        </div>
+      </form>
+
+      <div class="wf-results">
+        <div id="wfSummary" class="wf-summary" role="status" aria-live="polite">No data yet.</div>
+        
+        <div class="wf-chart-container">
+          <h4>California Wildfire Trends</h4>
+          <canvas id="wildfireChart" width="800" height="400"></canvas>
+        </div>
+        
+        <div class="wf-table-wrap">
+          <table class="wf-table" id="wfTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Status</th>
+                <th>Sources</th>
+              </tr>
+            </thead>
+            <tbody id="wfTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+	
+    <!-- ▲▲ Added: Wildfire Events widget ▲▲ -->
+
+    <section class="panel" id="mapSection">
+      <h3 data-i18n="map-h3">Map: Recovery Hubs &amp; Wildfire Events</h3>
+      <p class="small">Altadena/Pasadena recovery infrastructure. Use filters to toggle layers.</p>
+      <div class="map-filters">
+        <button class="map-filter-btn active" data-layer="all">🗺️ All</button>
+        <button class="map-filter-btn active" data-layer="hubs">🏢 Recovery Hubs</button>
+        <button class="map-filter-btn active" data-layer="health">🏥 Health</button>
+        <button class="map-filter-btn active" data-layer="schools">🏫 Schools</button>
+        <button class="map-filter-btn active" data-layer="fire">🚒 Fire Stations</button>
+        <button class="map-filter-btn active" data-layer="water">💧 Water</button>
+        <button class="map-filter-btn active" data-layer="parks">🌳 Parks</button>
+      </div>
+      <div id="map" role="region" aria-label="Map of recovery hubs"></div>
+    </section>
+    
+    <footer>
+      <div>Built from your Altadena Fire Rebuild plan (sections: demographics, risk, hubs, water, transit, green rebuild, equity, monitoring). Pages referenced inline above. <strong>Source:</strong> your uploaded PDF.</div>
+      <div style="margin-top:6px" class="small">Accessibility: keyboard navigation, focusable controls, reduced motion by OS setting, print stylesheet included.</div>
+    </footer>
+  </main>
+</div>
+
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<script src="script.js"></script>
+  <script>
+    // ======================= SCROLL PROGRESS BAR =======================
+    const scrollBar = document.getElementById('scrollBar');
+    window.addEventListener('scroll', () => {
+      const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+      if (scrollBar) scrollBar.style.width = Math.min(pct, 100) + '%';
+    }, { passive: true });
+
+    // ======================= DARK / LIGHT MODE =======================
+    const themeBtn = document.getElementById('themeToggle');
+    function applyTheme(mode) {
+      document.body.classList.toggle('light-mode', mode === 'light');
+      if (themeBtn) themeBtn.textContent = mode === 'light' ? '🌙' : '☀️';
+    }
+    applyTheme(localStorage.getItem('theme') || 'dark');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const next = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+        localStorage.setItem('theme', next);
+        applyTheme(next);
+      });
+    }
+
+    // ======================= TTS STOP BUTTON =======================
+    const ttsStop = document.getElementById('ttsStop');
+    if (ttsStop) {
+      ttsStop.addEventListener('click', () => {
+        window.speechSynthesis.cancel();
+        ttsStop.classList.remove('visible');
+      });
+    }
+
+    // ======================= MOBILE SIDEBAR OVERLAY =======================
+    const hideBtn = document.getElementById('hideSidebar');
+    const showBtn = document.getElementById('showSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const nav = document.getElementById('sidebar');
+    const app = document.querySelector('.app');
+    const sidebar = document.getElementById('sidebar');
+
+    function openSidebar() {
+      app.classList.remove('sidebar-hidden');
+      if (window.innerWidth <= 768) {
+        nav.classList.add('mobile-open');
+        overlay.classList.add('active');
+      }
+      localStorage.removeItem('sidebarHidden');
+    }
+    function closeSidebar() {
+      if (window.innerWidth <= 768) {
+        nav.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+      } else {
+        app.classList.add('sidebar-hidden');
+        localStorage.setItem('sidebarHidden', 'true');
+      }
+    }
+    hideBtn.addEventListener('click', closeSidebar);
+    showBtn.addEventListener('click', openSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+    if (localStorage.getItem('sidebarHidden') === 'true' && window.innerWidth > 768) {
+      app.classList.add('sidebar-hidden');
+    }
+
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) window.scrollTo({ top: section.offsetTop - 80, behavior: 'smooth' });
+    }
+  </script>
+  </body>
+</html>
+
