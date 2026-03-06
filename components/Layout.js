@@ -127,7 +127,7 @@ export default function Layout({ children, tocLinks, activePage }) {
             />
             <div className="pdf-link-wrapper">
               <a
-                href="/USGBC%20AURA%20Report.pdf"
+                href={`${router.basePath}/USGBC%20AURA%20Report.pdf`}
                 target="_blank"
                 rel="noreferrer"
                 className="nav-page-btn"
